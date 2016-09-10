@@ -1,4 +1,4 @@
 package ru.dorofeev.sandbox.rabbitmqsample.model
 
-class Assignment(personName: String, roleName: String) {
+class Assignment(val personName: String, val roleName: String) {
 }

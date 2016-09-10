@@ -8,6 +8,7 @@ class Repository {
 	private val assignments = mutableMapOf<Long, Assignment>()
 	private val roles = mutableListOf<Role>()
 	private val baseRoles = mutableListOf<String>()
+	private val accounts = mutableListOf<Account>()
 
 	fun addPerson(newPerson: Person) {
 		people.add(newPerson)
@@ -29,6 +30,22 @@ class Repository {
 
 	fun getBaseRoles() : List<String> {
 		return baseRoles.toList()
+	}
+
+	fun getAssignment(id: Long): Assignment? {
+		return assignments[id]
+	}
+
+	fun getRole(roleName: String): Role? {
+		return roles.find { it.name == roleName }
+	}
+
+	fun getPerson(personName: String): Person? {
+		return people.find { it.name == personName }
+	}
+
+	fun getAccount(accountName: String): Account? {
+		return accounts.find { it.name == accountName }
 	}
 
 }

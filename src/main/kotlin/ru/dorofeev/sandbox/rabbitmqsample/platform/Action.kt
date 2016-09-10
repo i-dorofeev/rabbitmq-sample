@@ -18,10 +18,12 @@ class CreateUserAction(val name: String) : Action {
 
 }
 
-class CreateRoleAction(val name: String) : Action {
+class CreateRoleAction(
+		val name: String,
+        val resourceId: String) : Action {
 
 	override fun doAction(ctx: ApplicationContext): Event {
-		val newRole = Role(name)
+		val newRole = Role(name, resourceId)
 		ctx.repository.addRole(newRole)
 		return RoleCreatedEvent(name)
 	}

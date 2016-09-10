@@ -14,7 +14,7 @@ class TestClass {
 				mapping(PersonCreatedEvent::class.java, AddBaseAssignmentsToNewPersonEventHandler::class.java)
 		))
 
-		runner.add(CreateRoleAction("employee"))
+		runner.add(CreateRoleAction("employee", resourceId = "ad"))
 		runner.add(AddBaseRoleAction("employee"))
 		runner.add(CreateUserAction("dorofeev.iv"))
 		runner.process()

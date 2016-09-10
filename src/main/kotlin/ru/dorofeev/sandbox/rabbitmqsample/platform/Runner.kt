@@ -25,14 +25,22 @@ class Runner(val applicationContext: ApplicationContext, val rules: List<Rule>) 
 				} else if (message is Event) {
 
 					rules.forEach {
-						it.getEventHandler(message)?.handle(applicationContext, message)?.forEach {
-							messageQueue.offer(it)
+						it.getEventHandler(message)?.let {
+							messageQueue.offer(EventHandlerInstanceMessage(it, message))
 						}
+					}
+				} else if (message is EventHandlerInstanceMessage) {
+					message.eventHandler.handle(applicationContext, message.event).forEach { action ->
+						messageQueue.offer(action)
 					}
 				}
 			}
 		} while (message != null)
 	}
+}
+
+class EventHandlerInstanceMessage(val eventHandler: EventHandler, val event: Event) {
+
 }
 
 interface Rule {
