@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-async:0.1-alpha">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-async/0.1-alpha/a085ebfd242152a79cea74ffda57e4f065f9c250/kotlinx-coroutines-async-0.1-alpha.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-async/0.1-alpha/ea56b0478cafe5e78d329803b8946f5eaa2ef1a6/kotlinx-coroutines-async-0.1-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
