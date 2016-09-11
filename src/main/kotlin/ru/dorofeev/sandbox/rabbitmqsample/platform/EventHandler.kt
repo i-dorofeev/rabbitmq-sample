@@ -1,19 +1,19 @@
 package ru.dorofeev.sandbox.rabbitmqsample.platform
 
-interface EventHandler {
-	fun handle(ctx: ApplicationContext, event: Event): List<Action>
+interface Handler<T> {
+	fun handle(ctx: ApplicationContext, obj: T): List<Message>
 }
 
-class LoggingEventHandler : EventHandler {
-	override fun handle(ctx: ApplicationContext, event: Event): List<Action> {
+class LoggingEventHandler : Handler<Event> {
+	override fun handle(ctx: ApplicationContext, event: Event): List<Message> {
 		return listOf(LogAction(event.toString()))
 	}
 
 }
 
-class AddBaseAssignmentsToNewPersonEventHandler : EventHandler {
+class AddBaseAssignmentsToNewPersonEventHandler : Handler<Event> {
 
-	override fun handle(ctx: ApplicationContext, event: Event): List<Action> {
+	override fun handle(ctx: ApplicationContext, event: Event): List<Message> {
 		if (event !is PersonCreatedEvent)
 			return emptyList()
 
@@ -24,9 +24,9 @@ class AddBaseAssignmentsToNewPersonEventHandler : EventHandler {
 	}
 }
 
-class AssignmentAddedEventHandler : EventHandler {
+class AssignmentAddedEventHandler : Handler<Event> {
 
-	override fun handle(ctx: ApplicationContext, event: Event): List<Action> {
+	override fun handle(ctx: ApplicationContext, event: Event): List<Message> {
 		if (event !is AssignmentCreatedEvent)
 			return emptyList()
 
@@ -43,8 +43,18 @@ class AssignmentAddedEventHandler : EventHandler {
 				.map { ctx.repository.getAccount(it) ?: throw RuntimeException("account[$it] not found") }
 				.find { it.resourceId == role.resourceId }
 
-		//if (accountForRole == null)
+		if (accountForRole == null)
+			return listOf(Failure("noAccountForRoleApplication"))
+
 		return emptyList()
+	}
+
+}
+
+class NoAccountForRoleApplicationFailureHandler : Handler<Failure> {
+	
+	override fun handle(ctx: ApplicationContext, obj: Failure): List<Message> {
+		throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 
 }

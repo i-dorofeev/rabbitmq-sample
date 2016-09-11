@@ -2,7 +2,7 @@ package ru.dorofeev.sandbox.rabbitmqsample.platform
 
 import java.util.*
 
-abstract class Event {
+abstract class Event : Message {
 
 	val timestamp = Date()
 

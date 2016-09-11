@@ -2,9 +2,12 @@ package ru.dorofeev.sandbox.rabbitmqsample.platform
 
 import java.util.*
 
-class Runner(val applicationContext: ApplicationContext, val rules: List<Rule>) {
+class Runner(
+		val applicationContext: ApplicationContext,
+		val eventHandlers: List<Rule<Event>>,
+		val failureHandlers: List<Rule<Failure>>) {
 
-	val messageQueue = ArrayDeque<Any>()
+	val messageQueue = ArrayDeque<Message>()
 
 	fun add(action: Action) {
 		messageQueue.offer(action)
@@ -19,19 +22,26 @@ class Runner(val applicationContext: ApplicationContext, val rules: List<Rule>) 
 				println("Message: ${message.javaClass}")
 
 				if (message is Action) {
-					val event = message.doAction(applicationContext)
-					if (event != null)
-						messageQueue.offer(event)
+					message.doAction(applicationContext).forEach {
+						messageQueue.offer(it)
+					}
+
 				} else if (message is Event) {
 
-					rules.forEach {
-						it.getEventHandler(message)?.let {
-							messageQueue.offer(EventHandlerInstanceMessage(it, message))
+					eventHandlers.forEach { rule ->
+						rule(message)?.let { handler ->
+							messageQueue.offer(EventHandlerInstanceMessage(handler, message))
 						}
 					}
 				} else if (message is EventHandlerInstanceMessage) {
 					message.eventHandler.handle(applicationContext, message.event).forEach { action ->
 						messageQueue.offer(action)
+					}
+				} else if (message is Failure) {
+					failureHandlers.forEach { rule ->
+						rule(message)?.let { handler ->
+							messageQueue.offer(FailureHandlerInstanceMessage(handler, message))
+						}
 					}
 				}
 			}
@@ -39,32 +49,24 @@ class Runner(val applicationContext: ApplicationContext, val rules: List<Rule>) 
 	}
 }
 
-class EventHandlerInstanceMessage(val eventHandler: EventHandler, val event: Event) {
+class EventHandlerInstanceMessage(val eventHandler: Handler<Event>, val event: Event) : Message {
 
 }
 
-interface Rule {
+class FailureHandlerInstanceMessage(val failureHandler: Handler<Failure>, val failure: Failure) : Message {
 
-	fun getEventHandler(event: Event) : EventHandler?
 }
 
-class MappingRule(val eventHandlerClass: Class<out EventHandler>, val eventClass: Class<out Event>?) : Rule {
+typealias Rule<T> = (T) -> Handler<T>?
 
-	override fun getEventHandler(event: Event): EventHandler? {
-
-		if (eventClass != null && event.javaClass != eventClass)
-			return null
-
-		return eventHandlerClass.newInstance()
+fun mapping(eventClass: Class<out Event>?, eventHandlerClass: Class<out Handler<Event>>): Rule<Event> {
+	return { event ->
+		if (eventClass != null && event.javaClass != eventClass) null
+		else eventHandlerClass.newInstance()
 	}
-
 }
 
-fun mapping(event: Class<out Event>, eventHandler: Class<out EventHandler>): Rule {
-	return MappingRule(eventHandler, event)
-}
-
-fun allEvents(eventHandler: Class<out EventHandler>) : Rule {
-	return MappingRule(eventHandler, null)
+fun allEvents(eventHandler: Class<out Handler<Event>>) : Rule<Event> {
+	return mapping(null, eventHandler)
 }
 

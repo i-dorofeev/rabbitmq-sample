@@ -6,9 +6,11 @@ class ApplicationContext {
 
 	val repository = Repository()
 
-	fun initRunner(rules: List<Rule>): Runner {
+	fun initRunner(
+			eventHandlers: List<Rule<Event>>,
+			failureHandlers: List<Rule<Failure>>): Runner {
 
-		return Runner(this, rules)
+		return Runner(this, eventHandlers, failureHandlers)
 	}
 
 }

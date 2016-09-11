@@ -9,10 +9,14 @@ class TestClass {
 	fun testMethod() {
 
 		val app = ApplicationContext()
-		val runner = app.initRunner(listOf(
-				allEvents(LoggingEventHandler::class.java),
-				mapping(PersonCreatedEvent::class.java, AddBaseAssignmentsToNewPersonEventHandler::class.java)
-		))
+		val runner = app.initRunner(
+				listOf(
+					allEvents(LoggingEventHandler::class.java),
+					mapping(PersonCreatedEvent::class.java, AddBaseAssignmentsToNewPersonEventHandler::class.java)),
+				listOf(
+					{ failure -> if (failure.type == "noAccountForRoleApplication") NoAccountForRoleApplicationFailureHandler() else null }
+				)
+		)
 
 		runner.add(CreateRoleAction("employee", resourceId = "ad"))
 		runner.add(AddBaseRoleAction("employee"))
