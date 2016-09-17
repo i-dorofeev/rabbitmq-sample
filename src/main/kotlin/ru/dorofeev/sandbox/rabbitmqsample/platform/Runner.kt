@@ -22,7 +22,8 @@ class Runner(
 				println("Message: ${message.javaClass}")
 
 				if (message is Action) {
-					message.doAction(applicationContext).forEach {
+					val messages = message.doAction(applicationContext)
+					messages.forEach {
 						messageQueue.offer(it)
 					}
 

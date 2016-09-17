@@ -11,6 +11,13 @@ abstract class Event : Message {
 	}
 }
 
+class ActionCompletedEvent(val wfHandle: WorkflowDescriptor, val actionId: Int) : Event() {
+
+	override fun toString(): String {
+		return super.toString() + "Action completed"
+	}
+}
+
 class PersonCreatedEvent(val name: String) : Event() {
 
 	override fun toString(): String {
